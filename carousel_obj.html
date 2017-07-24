@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Use an object-oriented wrapping for a carousel</title>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			#box{
+				position: relative;
+				width: 500px;
+				height: 350px;
+				overflow: hidden;
+				margin: 20px auto;
+			}
+			#list{
+				width: 2500px;
+				position: absolute;
+				left: 0;
+				top: 0;
+			}
+			#list li{
+				list-style: none;
+				float: left;
+			}
+			#list li img{
+				width: 500px;
+				height: 350px;
+			}
+			#prev{
+				position: absolute;
+				left: 0;
+				top: 50%;
+				color: #FFFFFF;
+				background: rgba(0,0,0,0.6);
+			}
+			#next{
+				position: absolute;
+				right: 0;
+				top: 50%;
+				color: #FFFFFF;
+				background: rgba(0,0,0,0.6);
+			}
+			#box span{
+				cursor: pointer;
+			}
+			#point{
+				position: absolute;
+				left: 50%;
+				bottom: 10px;
+				margin-left: -30px;
+			}
+			#point li{
+				list-style: none;
+				float: left;
+				margin-right: 10px;
+				width: 10px;
+				height: 10px;
+				border-radius: 50%;
+				border: 1px solid #FFFFFF;
+				background: rgba(0,0,0,0.5);
+				cursor: pointer;
+			}
+			#point li.active{
+				background: #FFFFFF;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="box">
+			<ul id="list">
+				<li><img src="img/10.jpg" alt="" /></li>
+				<li><img src="img/03.jpg" alt="" /></li>
+				<li><img src="img/04.jpg" alt="" /></li>
+				<!--<li><img src="img/06.jpg" alt="" /></li>
+				<li><img src="img/09.jpg" alt="" /></li>-->
+				<li><img src="img/10.jpg" alt="" /></li>
+				<li><img src="img/03.jpg" alt="" /></li>
+			</ul>
+			<ul id="point">
+				<li class="active"></li>
+				<li></li>
+				<li></li>
+				<!--<li></li>
+				<li></li>-->
+			</ul>
+			<span id="prev">prev</span>
+			<span id="next">next</span>
+		</div>
+		<script>
+		/*
+		 * 变形：
+		 * 1、尽量不会函数嵌套
+		 * 2、可以有全局变量
+		 * 3、把onload里面不是赋值的语句放到函数中
+		 * */
+		/*
+		 * 修改：
+		 * 1、onload中创建对象实例
+		 * 2、全局变量换成属性
+		 * 3、函数换成方法
+		 * 4、修改this指向	
+		 * */
+			window.onload = function(){
+				/*var odiv = document.getElementById('box');
+				var oul1 = document.getElementById('list');
+				var prev = document.getElementById('prev');
+				var next = document.getElementById('next');
+				var li1 = oul1.getElementsByTagName('li');
+				var oul2 = document.getElementById('point');
+				var li2 = oul2.getElementsByTagName('li');
+
+				var num = 1;
+				var timer = null;
+				var timer2 = null;
+				var stop = true;
+				var speed = 10;
+				
+				odiv.onmouseover = function(){
+					clearInterval(timer2);
+				}
+				odiv.onmouseout = function(){
+					timer2 = setInterval(move,3000);
+				}
+				odiv.onmousedown = function(ev){
+					var ev = ev || window.event;
+					ev.preventDefault();
+					return false;
+				}
+				move();
+				//开始显示第一张
+				oul1.style.left = -li1[0].offsetWidth + 'px';
+				prev.onclick = function(){
+					prev();
+				}
+				next.onclick = function(){
+					next();
+				}
+				timer2 = setInterval(move,4000);*/
+				/*function prev(){
+					if(stop){
+						stop = false;
+						num--;
+						for(var i=0;i<li2.length;i++){
+							li2[i].className = '';
+						}
+						if(num==0){
+							li2[2].className = 'active';
+						}else{
+							li2[num-1].className = 'active';
+						}
+						timer = setInterval(moveup,30);
+					}
+				}
+				function next(){
+					if(stop){
+						stop = false;
+						num++;
+						for(var i=0;i<li2.length;i++){
+							li2[i].className = '';
+						}
+						if(num==4){
+							li2[0].className = 'active';
+						}else{
+							li2[num-1].className = 'active';
+						}
+						timer = setInterval(movedown,30);
+					}
+				}
+				function moveup(){
+					if(oul1.offsetLeft != -li1[0].offsetWidth * num){
+						oul1.style.left = oul1.offsetLeft + speed + 'px';
+					}else{
+						clearInterval(timer);
+						stop = true;
+						//执行完这个动作后再判断变换
+						if(num==0){
+							num=3;
+							oul1.style.left = -li1[0].offsetWidth * num + 'px';
+						}
+					}
+				}
+				function movedown(){
+					if(oul1.offsetLeft != -li1[0].offsetWidth * num){
+						oul1.style.left = oul1.offsetLeft-speed + 'px';
+					}else{
+						clearInterval(timer);
+						stop = true;
+						//执行完后再进行变换判断
+						if(num==4){
+							num=1;
+							oul1.style.left = -li1[0].offsetWidth + 'px';
+						}
+					}
+				}
+				function move(){
+					num++;
+					for(var i=0;i<li2.length;i++){
+						li2[i].className = '';
+					}
+					if(num==4){
+						li2[0].className = 'active';
+					}else{
+						li2[num-1].className = 'active';
+					}
+					timer = setInterval(movedown,30);//这个执行时间要比外部的时间执行短，再外部时钟执行下一次之前要完成动作，否则会连续触发
+				}*/
+
+				var box = new Carousel('box');
+				box.init();
+				window.onblur = function(){
+					//页面失去焦点后停止自动播放，防止计时出现错误，造成错乱
+					clearInterval(box.timer2);
+				}
+				window.onfocus = function(){
+					//回到页面再重新运行代码
+					box.init();
+				}
+			}
+			function Carousel(id){
+				this.odiv = document.getElementById(id);
+				this.oul1 = document.getElementById('list');
+				this.prev = document.getElementById('prev');
+				this.next = document.getElementById('next');
+				this.li1 = this.oul1.getElementsByTagName('li');
+				this.oul2 = document.getElementById('point');
+				this.li2 = this.oul2.getElementsByTagName('li');
+				
+				this.width = this.li1[0].offsetWidth;//单张图宽度
+				this.imgs = this.li1.length;//图片个数
+				this.points = this.li2.length;//显示点数
+//				console.log(this.imgs);
+				this.num = 1;//当前图片下标
+				this.timer = null;//过渡效果定时器
+				this.timer2 = null;//自动播放定时器
+				this.stop = true;//判断过渡效果执行完的开关
+//				this.speed = 10;//过渡效果运动速度
+			}
+			Carousel.prototype.init = function(){
+				var _this = this;
+				this.odiv.onmouseover = function(){
+					clearInterval(_this.timer2);
+				}
+				this.odiv.onmouseout = function(){
+					_this.timer2 = setInterval(function(){
+						_this.move();
+					},3000);
+				}
+				this.odiv.onmousedown = function(ev){
+					var ev = ev || window.event;
+					ev.preventDefault();
+					return false;
+				}
+				this.move();
+				//开始显示第一张
+				this.oul1.style.left = -this.width + 'px';
+				this.prev.onclick = function(){
+					_this.prevpage(_this);//需要传入一个参数，否则函数执行对象是window
+				}
+				this.next.onclick = function(){
+					_this.nextpage(_this);//名字不能是next()存在冲突,需要传入一个参数，否则函数执行对象是window
+				}
+				for(var i=0;i<this.li2.length;i++){
+					this.li2[i].index = i;
+					this.li2[i].onclick = function(){
+						_this.point(_this,this);
+					}
+				}
+				this.timer2 = setInterval(function(){
+					_this.move();
+				},3000);
+			}
+			Carousel.prototype.prevpage = function(obj){
+				if(this.stop){
+					this.stop = false;
+					this.num--;
+					for(var i=0;i<this.points;i++){
+						this.li2[i].className = '';
+					}
+					if(this.num==0){
+						this.li2[2].className = 'active';
+					}else{
+						this.li2[this.num-1].className = 'active';
+					}
+					this.timer = setInterval(function(){
+						obj.moveup();//不使用参数则是window在调用，而不是对象在调用
+					},30);
+				}
+			}
+			Carousel.prototype.nextpage = function(obj){
+				if(this.stop){
+					this.stop = false;
+					this.num++;
+					for(var i=0;i<this.points;i++){
+						this.li2[i].className = '';
+					}
+					if(this.num==this.imgs-1){
+						this.li2[0].className = 'active';
+					}else{
+						this.li2[this.num-1].className = 'active';
+					}
+					this.timer = setInterval(function(){
+						obj.movedown();//不使用参数则是window在调用，而不是对象在调用
+					},30);
+				}
+			}
+			Carousel.prototype.moveup = function(){
+				if(this.oul1.offsetLeft != -this.width * this.num){
+					var speed = (-this.width*this.num-this.oul1.offsetLeft)/10;
+					speed = speed > 0 ? Math.ceil(speed) : Math.floor(speed);
+					this.oul1.style.left = this.oul1.offsetLeft + speed + 'px';
+				}else{
+					clearInterval(this.timer);
+					this.stop = true;
+					//执行完这个动作后再判断变换
+					if(this.num==0){
+						this.num=this.imgs-2;
+						this.oul1.style.left = -this.width * this.num + 'px';
+					}
+				}
+			}
+			Carousel.prototype.movedown = function(){
+				if(this.oul1.offsetLeft != -this.width * this.num){//????
+					var speed = (-this.width*this.num-this.oul1.offsetLeft)/10;
+					speed = speed > 0 ? Math.ceil(speed) : Math.floor(speed);
+					this.oul1.style.left = this.oul1.offsetLeft + speed + 'px';
+				}else{
+					clearInterval(this.timer);
+					this.stop = true;
+					//执行完后再进行变换判断
+					if(this.num==this.imgs-1){
+						this.num=1;
+						this.oul1.style.left = -this.width + 'px';
+					}
+				}
+			}
+			Carousel.prototype.point = function(obj,pnt){
+
+				this.num = pnt.index+1;
+				for(var i=0;i<this.li2.length;i++){
+					this.li2[i].className = '';
+				}
+				this.li2[pnt.index].className = 'active';
+				this.timer = setInterval(function(){
+					obj.pointmove();//不使用参数则是window在调用，而不是对象在调用
+					//因此才需要把执行的部分代码移出去，否则需要每一个this都改写成obj
+				},30);
+			}
+			Carousel.prototype.pointmove = function(){
+				if(this.oul1.offsetLeft != -this.width * this.num){
+					var speed = (-this.width*this.num-this.oul1.offsetLeft)/10;
+					speed = speed > 0 ? Math.ceil(speed) : Math.floor(speed);
+					this.oul1.style.left = this.oul1.offsetLeft + speed + 'px';
+				}else{
+					clearInterval(this.timer);
+					this.stop = true;
+				}
+			}
+			Carousel.prototype.move = function(){
+				var _this = this;
+				this.num++;
+				for(var i=0;i<_this.points;i++){
+					this.li2[i].className = '';
+				}
+				if(this.num==this.imgs-1){
+					this.li2[0].className = 'active';
+				}else{
+					this.li2[this.num-1].className = 'active';
+				}
+				this.timer = setInterval(function(){
+					_this.movedown();//不使用_this会认为是window在调用，出错
+				},30);//这个执行时间要比外部的时间执行短，再外部时钟执行下一次之前要完成动作，否则会连续触发
+			}
+		</script>
+	</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Use the function to wrap the carousel</title>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			
+			#box{
+				position: relative;
+				width: 500px;
+				height: 350px;
+				overflow: hidden;
+				margin: 20px auto;
+			}
+			#list{
+				width: 2500px;
+				position: absolute;
+				left: 0;
+				top: 0;
+			}
+			#list li{
+				list-style: none;
+				float: left;
+			}
+			#list li img{
+				width: 500px;
+				height: 350px;
+			}
+			#prev{
+				position: absolute;
+				left: 0;
+				top: 50%;
+				color: #FFFFFF;
+				background: rgba(0,0,0,0.6);
+			}
+			#next{
+				position: absolute;
+				right: 0;
+				top: 50%;
+				color: #FFFFFF;
+				background: rgba(0,0,0,0.6);
+			}
+			#box span{
+				cursor: pointer;
+			}
+			#point{
+				position: absolute;
+				left: 50%;
+				bottom: 10px;
+				margin-left: -30px;
+			}
+			#point li{
+				list-style: none;
+				float: left;
+				margin-right: 10px;
+				width: 10px;
+				height: 10px;
+				border: 1px solid #FFFFFF;
+				border-radius: 50%;
+				background: rgba(0,0,0,0.5);
+				cursor: pointer;
+			}
+			#point li.active{
+				background: #FFFFFF;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="box">
+			<ul id="list">
+				<li><img src="img/10.jpg" alt="" /></li>
+				<li><img src="img/03.jpg" alt="" /></li>
+				<li><img src="img/04.jpg" alt="" /></li>
+				<!--<li><img src="img/06.jpg" alt="" /></li>
+				<li><img src="img/09.jpg" alt="" /></li>-->
+				<li><img src="img/10.jpg" alt="" /></li>
+				<li><img src="img/03.jpg" alt="" /></li>
+			</ul>
+			<ul id="point">
+				<li class="active"></li>
+				<li></li>
+				<li></li>
+				<!--<li></li>
+				<li></li>-->
+			</ul>
+			<span id="prev">prev</span>
+			<span id="next">next</span>
+		</div>
+		<script>
+			window.onload = function(){
+				var odiv = document.getElementById('box');
+				var oul1 = document.getElementById('list');
+				var prev = document.getElementById('prev');
+				var next = document.getElementById('next');
+				var li1 = oul1.getElementsByTagName('li');
+				var oul2 = document.getElementById('point');
+				var li2 = oul2.getElementsByTagName('li');
+
+				var num = 1;
+				var timer = null;
+				var timer2 = null;
+				var stop = true;
+				var speed = 10;
+				odiv.onmouseover = function(){
+					clearInterval(timer2);
+				}
+				odiv.onmouseout = function(){
+					timer2 = setInterval(move,3000);
+				}
+				odiv.onmousedown = function(ev){
+					var ev = ev || window.event;
+					ev.preventDefault();
+					return false;
+				}
+				move();
+				//开始显示第一张
+				oul1.style.left = -li1[0].offsetWidth + 'px';
+				prev.onclick = function(){
+					if(stop){
+						stop = false;
+						num--;
+						for(var i=0;i<li2.length;i++){
+							li2[i].className = '';
+						}
+						if(num==0){
+							li2[2].className = 'active';	
+						}else{
+							li2[num-1].className = 'active';
+						}
+						timer = setInterval(function(){
+							if(oul1.offsetLeft != -li1[0].offsetWidth * num){
+								oul1.style.left = oul1.offsetLeft + speed + 'px';
+							}else{
+								clearInterval(timer);
+								stop = true;
+								//执行完这个动作后再判断变换
+								if(num==0){
+									num=3;
+									oul1.style.left = -li1[0].offsetWidth * num + 'px';
+								}
+							}
+						},30);
+					}
+				}
+				next.onclick = function(){
+					if(stop){
+						stop = false;
+						num++;
+						for(var i=0;i<li2.length;i++){
+							li2[i].className = '';
+						}
+						if(num==4){
+							li2[0].className = 'active';	
+						}else{
+							li2[num-1].className = 'active';
+						}
+						timer = setInterval(function(){
+							if(oul1.offsetLeft != -li1[0].offsetWidth * num){
+								oul1.style.left = oul1.offsetLeft-speed + 'px';
+							}else{
+								clearInterval(timer);
+								stop = true;
+								//执行完后再进行变换判断
+								if(num==4){
+									num=1;
+									oul1.style.left = -li1[0].offsetWidth + 'px';
+								}
+							}
+						},30);	
+					}
+				}
+				for(var i=0;i<li2.length;i++){
+					(function(j){
+						li2[i].onclick = function(){
+							if(num<(j+1)){
+								speed = -10;
+							}else{
+								speed = 10;
+							}
+							num = j+1;
+							for(var i=0;i<li2.length;i++){
+								li2[i].className = '';
+							}
+							li2[j].className = 'active';
+							timer = setInterval(function(){
+								if(oul1.offsetLeft != -li1[0].offsetWidth * num){
+									oul1.style.left = oul1.offsetLeft+speed + 'px';
+								}else{
+									clearInterval(timer);
+									stop = true;
+								}
+							},30);
+						}
+					})(i);
+				}
+				timer2 = setInterval(move,4000);
+				function move(){
+					num++;
+					for(var i=0;i<li2.length;i++){
+						li2[i].className = '';
+					}
+					if(num==4){
+						li2[0].className = 'active';
+					}else{
+						li2[num-1].className = 'active';
+					}
+					timer = setInterval(function(){
+						if(oul1.offsetLeft != -li1[0].offsetWidth * num){
+							oul1.style.left = oul1.offsetLeft-speed + 'px';
+						}else{
+							clearInterval(timer);
+							stop = true;
+							//执行完后再进行变换判断
+							if(num==4){
+								num=1;
+								oul1.style.left = -li1[0].offsetWidth + 'px';
+							}
+						}
+					},30);//这个执行时间要比外部的时间执行短，再外部时钟执行下一次之前要完成动作，否则会连续触发
+				}
+				window.onblur = function(){
+					clearInterval(timer2);
+//					clearInterval(timer);
+				}
+				window.onfocus = function(){
+					timer2 = setInterval(move,3000);
+				}
+			}
+		</script>
+	</body>
+</html>
